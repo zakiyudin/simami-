@@ -53,15 +53,22 @@
                             <form action="{{ url('/doLogin') }}" method="post">
                                 {{ csrf_field() }}
                                 <div class="form-group">
-                                    
                                     <input class="au-input au-input--full" type="email" name="email" placeholder="Email">
                                 </div>
                                 <div class="form-group">
                                     
                                     <input class="au-input au-input--full" type="password" name="password" placeholder="Password">
                                 </div>
+
+                                @if (session('error'))
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    <strong>{{ Session::get('error') }}</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                @endif
                                 
                                 <button class="au-btn au-btn--block au-btn--blue m-b-20" type="submit">LOGIN</button>
+                                <a class="au-btn au-btn--block au-btn--green m-b-20 text-center" href="{{ url('/') }}">BERANDA</a>
                                 
                             </form>
                             

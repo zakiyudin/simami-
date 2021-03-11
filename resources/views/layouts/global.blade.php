@@ -89,6 +89,7 @@
 
   <!-- Custom scripts for all pages-->
   <script src="{{ asset('sbadmin/js/sb-admin-2.min.js') }}"></script>
+  <script src="{{ asset('sbadmin/js/bootstrap-timepicker.js') }}"></script>
 
   <!-- Page level plugins -->
   {{-- <script src="{{ asset('sbadmin/vendor/chart.js/Chart.min.js') }}"></script> --}}
@@ -105,6 +106,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.min.js"></script>
 {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script> --}}
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 

@@ -18,42 +18,59 @@
             </button>
         </div>
         @endif
-        <div class="row">
-            <div class="col-md-12">
-                <div class="overview-wrap">
-                    <h2 class="title-1 mb-1">Data Jenis Kegiatan</h2>                
-                        {{-- <i class="fas fa-user-plus"></i> --}}
-                        <button class="btn btn-primary m-2" data-toggle="modal" data-target="#modal_tambah_edit" id="tambah"><i class="fas fa-plus-square"></i>&nbsp;Tambah</button>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="overview-wrap">
+                            <h2 class="title-1 mb-1">DATA JENIS KEGIATAN</h2>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <br>
+
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="overview-wrap">
+                            <button class="btn btn-primary m-2" id="tambah"><i class="fas fa-plus-square"></i>&nbsp;Tambah</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered data" id="data_jenis_kegiatan" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                            {{-- <th width="30px">No</th> --}}
+                            <th>No</th>
+                            <th width="70%">Nama Kegiatan</th>
+                            <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+        
+            </div>
         </div>
+
+        
 
 
     
 
 
         <!-- DataTales Example -->
-        <div class="card shadow mb-4">
-            <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered data" id="data_jenis_kegiatan" width="100%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                    {{-- <th width="30px">No</th> --}}
-                    <th>No</th>
-                    <th width="70%">Nama Kegiatan</th>
-                    <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                </tbody>
-                </table>
-            </div>
-            </div>
-        </div>
-
+        
         </div>
         <!-- /.container-fluid -->
 
@@ -72,16 +89,15 @@
     </div>
     <div class="modal-body">
         <form action="" class="form-group" id="form-tambah-edit">
-        @csrf
-        <input type="hidden" name="id_jenis_kegiatan" id="id_jenis_kegiatan" class="form-control">
-        <label for="">Nama Jenis Kegiatan</label>
-        <input type="text" name="nama_kegiatan" id="nama_kegiatan" class="form-control">
-        <br>
+            @csrf
+            <input type="hidden" name="id_jenis_kegiatan" id="id_jenis_kegiatan" class="form-control">
+            <label for="">Nama Jenis Kegiatan</label>
+            <input type="text" name="nama_kegiatan" id="nama_kegiatan" class="form-control" required>
+            <br>
+            <button type="submit" class="btn btn-primary" id="btn_simpan" value="create">Simpan</button>
         </form>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="btn_simpan" value="create">Simpan</button>
-    </div>
+    
     </div>
     </div>
     </div>
@@ -122,7 +138,7 @@
                 }
             });
 
-            $("#data_jenis_kegiatan").DataTable({
+           var datatable = $("#data_jenis_kegiatan").DataTable({
                 processing  : true,
                 serverSide  : true,
                 ajax:"{{ route('jenis_kegiatan.index') }}",
@@ -134,37 +150,36 @@
             })
 
             $("#tambah").click(function(){
-                $("#btn-simpan").val('create-post');
-                $("#id_jenis_kegiatan").val('');
-                $("#form-tambah-edit").trigger('reset');
-                $("#modal-judul").html('Tambah Jenis Kegiatan');
-                $("#modal_tambah_edit").modal('show');
+                $("#modal-judul").html("Tambah Jenis Kegiatan Baru");
+               $("#modal_tambah_edit").modal("show");
             });
 
-            $("#btn_simpan").on('click', function(){
-                var nama_kegiatan = $("#nama_kegiatan").val();
+            if($("#form-tambah-edit").length > 0){
+                $("#form-tambah-edit").validate({
+                    submitHandler : function(form){
+                        var actionType = $("#btn_simpan").val();
+                        $("#btn_simpan").html("Sending...");
 
-                if(nama_kegiatan != ""){
-                    $.ajax({
-                        url:"{{ route('jenis_kegiatan.store') }}",
-                        type: "post",
-                        dataType:"json",
-                        data:{
-                            nama_kegiatan : nama_kegiatan
-                        },
-                        success : function(data){
-                            $("#modal_tambah_edit").modal('hide');
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ route('jenis_kegiatan.store') }}",
+                            data: $("#form-tambah-edit").serialize(),
+                            dataType: "json",
+                            success: function (data) {
+                                $("#form-tambah-edit").trigger("reset");
+                                $("#modal_tambah_edit").modal("hide");
+                                var table = $("#data_jenis_kegiatan").dataTable();
+                                table.fnDraw(false);
 
-                            swal("Berhasil !!", "Data Berhasil Disimpan", "success");
-                        },
-                        error : function(data){
-                            console.log("Error :", data);
-                        }
-                    })
-                }else{
-                    swal("Gagal !!", "Data Harus Diisi Semua", "warning");
-                }
-            })
+                                swal("Good job!", "Data Berhasil Disimpan", "success");
+                            },
+                            error : function(data){
+                                console.log("Error :", data);
+                            }
+                        });
+                    }
+                })
+            }
 
 
             $("body").on('click', '.edit-post', function(){
@@ -179,10 +194,15 @@
                     dataType : "json",
                     success: function(data){
                         $("#modal-judul").html('Edit Jenis Penceramah');
+                        $("#btn_simpan").val('update');
+                        $("#btn_simpan").html("Update");
                         $("#modal_tambah_edit").modal('show');
-                        $("btn_simpan").val('edit-post');
 
+                        $("#id_jenis_kegiatan").val(data.id_jenis_kegiatan);
                         $("#nama_kegiatan").val(data.nama_kegiatan);
+                    },
+                    error : function(data){
+                        console.log("Error :", data);
                     }
                 })
             })
@@ -199,6 +219,8 @@
                     },
                     dataType: "json",
                     success: function (response) {
+                        var table = $("#data_jenis_kegiatan").dataTable();
+                        table.fnDraw(false);
                         swal("Berhasil !!", "Data Berhasil Dihapus", "success");
                     }
                 });

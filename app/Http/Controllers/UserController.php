@@ -54,8 +54,8 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-        $id = $request->id;
-        $post = User::updateOrCreate(['id' => $id],
+        $post = User::updateOrCreate(
+            ['id' => $request->id],
             [
                 'name' => $request->name,
                 'email' => $request->email,
@@ -64,30 +64,10 @@ class UserController extends Controller
                 'alamat_ktp' => $request->alamat_ktp,
                 'password' => bcrypt($request->password),
                 'status_aktif' => $request->status_aktif
-            ]);
+            ]
+        );
 
         return response()->json($post);
-        // $nama = $request->input('name');
-        // $email = $request->input('email');
-        // $role = $request->input('role');
-        // $tgl_lahir = $request->input('tgl_lahir');
-        // $alamat_ktp = $request->input('alamat_ktp');
-        // $password = bcrypt($request->input('password'));
-        // $status_aktif = $request->input('status_aktif');
-
-        // $data = [
-        //     'name'          => $nama,
-        //     'email'         => $email,
-        //     'role'          => $role,
-        //     'tgl_lahir'     => $tgl_lahir,
-        //     'alamat_ktp'    => $alamat_ktp,
-        //     'password'      => $password,
-        //     'status_aktif'  => $status_aktif
-        // ];
-
-        // $result = User::tambahData($data);
-
-        // return response()->json($result);
     }
 
     /**

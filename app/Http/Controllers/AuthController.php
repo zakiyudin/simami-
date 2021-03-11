@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Session;
 
 class AuthController extends Controller
 {
@@ -18,6 +19,7 @@ class AuthController extends Controller
             return redirect('/dashboard');
         }
 
+        Session::flash('error', 'Email - Password Anda Salah!!!');
         return redirect('/login');
     }
 

@@ -49,28 +49,16 @@ class PenceramahController extends Controller
      */
     public function store(Request $request)
     {
-        $penceramah = Penceramah::where('id_penceramah', $request->id_penceramah)->first();
-
-        if($penceramah != ""){
-            $penceramah->update();
-        }else{
-            $penceramah = Penceramah::create([
-                'nama_penceramah' => $request->nama_penceramah,
-                'alamat_penceramah' => $request->alamat_penceramah,
-                'no_hp_penceramah' => $request->no_hp_penceramah
-            ]);
-        }
-
-        return response()->json($penceramah);
-        // $id = $request->id_penceramah;
-        // $post = Penceramah::updateOrCreate(['id_penceramah' => $id],
-        // [
-        //     'nama_penceramah' => $request->nama_penceramah,
-        //     'alamat_penceramah' => $request->alamat_penceramah,
-        //     'no_hp_penceramah' => $request->no_hp_penceramah
-        // ]);
-
-        // return response()->json($post);
+        $penceramah = Penceramah::updateOrCreate(
+                ['id_penceramah' => $request->id_penceramah],
+                [
+                    'nama_penceramah' => $request->nama_penceramah,
+                    'no_hp_penceramah' => $request->no_hp_penceramah,
+                    'alamat_penceramah' => $request->alamat_penceramah
+                ]
+            );
+        
+            return response()->json($penceramah);
     }
 
     /**

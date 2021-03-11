@@ -6,6 +6,8 @@ use App\Pengeluaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
+use PDF;
+use DB;
 
 class PengeluaranController extends Controller
 {
@@ -33,7 +35,9 @@ class PengeluaranController extends Controller
             ->rawColumns(['action', 'nominal_pengeluaran'])
             ->make(true);
         }
-        return view('pengeluaran.index');
+        $total_pengeluaran = DB::table('pengeluaran')->sum('nominal_pengeluaran');
+        $total_pengeluaran = 'Rp. ' . number_format($total_pengeluaran, 0, ",", ".");
+        return view('pengeluaran.index', ['total_pengeluaran' => $total_pengeluaran]);
     }
 
     /**
@@ -137,5 +141,14 @@ class PengeluaranController extends Controller
         $delete->delete();
 
         return response()->json($delete);
+    }
+
+    public function print_pdf($tgl_awal, $tgl_akhir)
+    {
+        $pengeluaran = DB::table('pengeluaran')->whereBetween('tanggal_pengeluaran', [$tgl_awal, $tgl_akhir])->get();
+
+        $pdf = PDF::loadview('pengeluaran.pengeluaran_pdf', ['pengeluaran' => $pengeluaran])->setPaper('f4');
+
+        return $pdf->stream();
     }
 }

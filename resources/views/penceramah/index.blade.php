@@ -24,7 +24,7 @@
                     <div class="overview-wrap">
                         <h2 class="title-1 mb-1">Data Penceramah</h2>                
                             {{-- <i class="fas fa-user-plus"></i> --}}
-                            <button class="btn btn-primary m-2" data-toggle="modal" data-target="#modal_tambah_edit" id="tambah"><i class="fas fa-plus-square"></i>&nbsp;Tambah</button>
+                            <button class="btn btn-primary m-2" id="tambah-penceramah"><i class="fas fa-plus-square"></i>&nbsp;Tambah</button>
                     </div>
                 </div>
                 <br>
@@ -88,11 +88,8 @@
               <label for="">Alamat Penceramah</label>
               <textarea name="alamat_penceramah" id="alamat_penceramah" cols="30" rows="7" class="form-control"></textarea>
               <br>
-
+              <button type="submit" class="btn btn-primary" id="btn_simpan" value="create">Simpan</button>
             </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btn_simpan" value="create">Simpan</button>
           </div>
         </div>
       </div>
@@ -133,7 +130,7 @@
                 }
             });
 
-            $("#data_penceramah").DataTable({
+         const datatable = $("#data_penceramah").DataTable({
                 processing : true,
                 serverSide : true,
                 ajax : "{{ route('penceramah.index') }}",
@@ -146,45 +143,38 @@
                 ]
             });
             
-            $("#tambah").click(function (e) { 
+            $("#tambah-penceramah").click(function (e) { 
                 e.preventDefault();
-                $("#btn_simpan").val('create-post');
-                $("#id_penceramah").val();
-                $("#form-tambah-edit").trigger('reset');
-                $("#modal-judul").html('Tambah Penceramah');
-                $("#modal_tambah_edit").modal('show');
+                $("#modal_tambah_edit").modal("show");
             });
 
-            $("#btn_simpan").click(function (e) { 
-                e.preventDefault();
-                var nama_penceramah = $("#nama_penceramah").val();
-                var alamat_penceramah = $("#alamat_penceramah").val();
-                var no_hp_penceramah = $("#no_hp_penceramah").val();
+            if($("#form-tambah-edit").length > 0){
+                $("#form-tambah-edit").validate({
+                    submitHandler : function(form){
+                        var actionType = $("btn_simpan").val();
+                        $("#btn_simpan").html("Sending...");
 
-                if(nama_penceramah != "" && alamat_penceramah != "" && no_hp_penceramah != ""){
-                    $.ajax({
-                        url:"{{ route('penceramah.store') }}",
-                        type: "post",
-                        dataType: "json",
-                        data : {
-                            nama_penceramah : nama_penceramah,
-                            alamat_penceramah : alamat_penceramah,
-                            no_hp_penceramah : no_hp_penceramah
-                        },
-                        success : function(data){
-                            $("#mdoal_tambah_edit").modal('hide');
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ route('penceramah.store') }}",
+                            data: $("#form-tambah-edit").serialize(),
+                            dataType: "json",
+                            success: function (data) {
+                                $("#form-tambah-edit").trigger("reset");
+                                $("#modal_tambah_edit").modal("hide");
+                                $("#btn_simpan").html("Sending...");
+                                var table = $("#data_penceramah").dataTable();
+                                table.fnDraw(false);
 
-                            swal("Good Job!", "Data Berhasi Disimpan", "success");
-                        },
-                        error : function(data){
-                            console.log("Error", data);
-                        }
-                    });
-                }else{
-                    swal("Error!!", "Data Harus Diisi", "warning");
-                }
-                
-            });
+                                swal("Good job!", "Data Berhasil Disimpan", "success");
+                            },
+                            error : function(data){
+                                console.log("Error :", data);
+                            }
+                        });
+                    }
+                })
+            }
 
 
             $("body").on('click', '.edit-post', function(){
@@ -202,6 +192,7 @@
                         $("#modal_tambah_edit").modal('show');
                         $("#btn_simpan").val('edit-post');
 
+                        $("#id_penceramah").val(response.id_penceramah);
                         $("#nama_penceramah").val(response.nama_penceramah);
                         $("#no_hp_penceramah").val(response.no_hp_penceramah);
                         $("#alamat_penceramah").val(response.alamat_penceramah);
@@ -221,6 +212,8 @@
                     },
                     dataType: "json",
                     success: function (response) {
+                        var table = $("#data_penceramah").dataTable();
+                        table.fnDraw(false);
                         swal("Berhasil", "Data Berhasil Dihapus", "success");
                     },
                     error:function(data){

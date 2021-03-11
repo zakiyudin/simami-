@@ -18,47 +18,53 @@
             </button>
         </div>
         @endif
-        <div class="row">
-            <div class="col-md-12">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-md-12">
                 <div class="overview-wrap">
-                    <h2 class="title-1 mb-1">Data User</h2>                
-                        {{-- <i class="fas fa-user-plus"></i> --}}
-                        <button class="btn btn-primary m-2" data-toggle="modal" data-target="#modal_tambah_edit" id="tambah_user"><i class="fas fa-plus-square"></i>&nbsp;Tambah</button>
+                  <h2 class="title-1 mb-1">DATA USER</h2>
                 </div>
-            </div>
-            <br>
-        </div>
-
-
-       
-
-
-          <!-- DataTales Example -->
-          <div class="card shadow mb-4">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered data" id="dataku" width="100%" cellspacing="0">
-                  <thead class="thead-dark">
-                    <tr>
-                      {{-- <th width="30px">No</th> --}}
-                      <th>No</th>
-                      <th>Nama</th>
-                      <th>Email</th>
-                      <th>Role</th>
-                      <th>Tanggal Lahir</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                      
-                  </tbody>
-                </table>
               </div>
             </div>
           </div>
 
-        </div>
-        <!-- /.container-fluid -->
+
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="overview-wrap m-2">
+                  <button class="btn btn-primary m-2" id="tambah_user"><i class="fas fa-plus-square"></i>&nbsp;Tambah</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card shadow mb-4">
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered data" id="dataku" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                      <tr>
+                        {{-- <th width="30px">No</th> --}}
+                        <th>No</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Tanggal Lahir</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
 
 
         
@@ -78,15 +84,15 @@
           @csrf
           <input type="hidden" name="id" id="id" class="form-control">
           <label for="">Nama User</label>
-          <input type="text" name="name" id="name" class="form-control">
+          <input type="text" name="name" id="name" class="form-control" required>
           <br>
 
           <label for="">Email</label>
-          <input type="email" name="email" id="email" class="form-control">
+          <input type="email" name="email" id="email" class="form-control" required>
           <br>
 
           <label for="">Peran</label>
-          <select name="role" id="role" class="form-control">
+          <select name="role" id="role" class="form-control" required>
             <option value="">.:: Pilih Satu ::.</option>
             <option value="admin">Admin</option>
             <option value="bendahara">Bendahara</option>
@@ -95,22 +101,20 @@
           <br>
 
           <label for="">Tanggal Lahir</label>
-          <input type="date" name="tgl_lahir" id="tgl_lahir" class="form-control">
+          <input type="date" name="tgl_lahir" id="tgl_lahir" class="form-control" required>
           <br>
 
           <label for="">Alamat</label>
-          <textarea name="alamat_ktp" id="alamat_ktp" cols="30" rows="7" class="form-control"></textarea>
+          <textarea name="alamat_ktp" id="alamat_ktp" cols="30" rows="7" class="form-control" required></textarea>
           <br>
 
           <label for="">Password</label>
-          <input type="password" name="password" id="password" class="form-control">
+          <input type="password" name="password" id="password" class="form-control" required>
 
           <label for="">Status Aktif</label>
-          <input type="radio" name="status_aktif" id="status_aktif" value="1">
+          <input type="radio" name="status_aktif" id="status_aktif" value="1" required>
+          <button type="submit" class="btn btn-primary" id="btn_simpan" value="create">Simpan</button>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="btn_simpan" value="create">Simpan</button>
       </div>
     </div>
   </div>
@@ -153,7 +157,7 @@
       }
     });
 
-    $("#dataku").DataTable({
+    const datatable = $("#dataku").DataTable({
       processing:true,
       serverSide:true,
       ajax:"{{ route('users.index') }}",
@@ -168,56 +172,39 @@
     });
 
     $("#tambah_user").click(function(){
-      $("#btn_simpan").val('create-post');
-      $("#id").val('');
-      $("#form-tambah-edit").trigger('reset');
       $("#modal-judul").html('Tambah User Baru');
       $("#modal_tambah_edit").modal("show");
     });
 
 
     //SIMMPAN DAN EDIT DATA USER
-    $("#btn_simpan").on('click', function(){
-      var nama = $("#name").val();
-      var email = $("#email").val();
-      var role = $("#role").val();
-      var tgl_lahir = $("#tgl_lahir").val();
-      var alamat_ktp = $("#alamat_ktp").val();
-      var password = $("#password").val();
-      var status_aktif = $("#status_aktif").val();
-      
-      if(nama != "" && email != "" && role != "" && tgl_lahir != "" && alamat_ktp != ""){
-        $("#btn_simpan").attr('disabled', 'disabled');
-        $.ajax({
-          url:"{{ route('users.store') }}",
-          type: "post",
-          dataType:'json',
-          data:{
-            name : nama,
-            email : email,
-            role : role,
-            tgl_lahir : tgl_lahir,
-            alamat_ktp : alamat_ktp,
-            password : password,
-            status_aktif : status_aktif
-          },
-          // cache: false,
-          success:function(data){
-            $("#form-tambah-edit").trigger('reset');
-            $("#modal_tambah_edit").modal('hide');
-            $("#btn_simpan").html('Simpan');
+    if($("#form-tambah-edit").length > 0){
+      $("#form-tambah-edit").validate({
+        submitHandler : function (form) {
+          var actionType = $("#btn_simpan").val();
+          $("#btn_simpan").html("Sending...");
 
-            swal("Good job!", "Data Berhasil Disimpan", "success");
+          $.ajax({
+            type: "POST",
+            url: "{{ route('users.store') }}",
+            data: $("#form-tambah-edit").serialize(),
+            dataType: "json",
+            success: function (data) {
+              $("#form-tambah-edit").trigger("reset");
+              $("#modal_tambah_edit").modal("hide");
+              $("#btn_simpan").html("Sending...");
+              var table = $("#dataku").dataTable();
+              table.fnDraw(false);
 
-          },
-          error:function(data){
-            console.log('error', data);
-          }
-        })
-      }else{
-        swal("Error !", "Data Harus Diisi", "warning");
-      }
-    });
+              swal("Good job!", "Data Berhasil Disimpan", "success");
+            },
+            error : function(data){
+              console.log("Error :", data);
+            }
+          });
+        }
+      })
+    }
 
 
     $('body').on('click', '.edit-post', function(){
@@ -231,9 +218,11 @@
         dataType: "json",
         success: function (data) {
           $("#modal-judul").html('Edit Users');
-          $("#btn_simpan").val('edit-post');
+          $("#btn_simpan").val('Update');
+          $("#btn_simpan").html("Update");
           $("#modal_tambah_edit").modal('show');
 
+          $("#id").val(data.id);
           $("#name").val(data.name);
           $("#email").val(data.email);
           $("#role").val(data.role);
@@ -241,6 +230,9 @@
           $("#alamat_ktp").val(data.alamat_ktp);
           $("#password").val(data.password);
           $("#status_aktif").val(data.status_aktif);
+        },
+        error : function(data){
+          console.log("Error : ", data);
         }
       });
     })
@@ -257,6 +249,8 @@
         },
         dataType: "json",
         success: function (response) {
+          var table = $("#dataku").dataTable();
+          table.fnDraw(false);
           swal("Good job!", "Data Berhasil Dihapus", "success");
         }
       });

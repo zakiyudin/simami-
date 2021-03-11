@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Builder;
 use App\Kegiatan;
+use App\Penceramah;
+use App\JenisKegiatan;
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KegiatanController extends Controller
 {
@@ -14,7 +19,36 @@ class KegiatanController extends Controller
      */
     public function index(Request $request)
     {
-        //
+        $penceramah = Penceramah::all();
+        $jenis_kegiatan = JenisKegiatan::all();
+                            
+        if($request->ajax()){
+            $kegiatan = DB::table('kegiatan')
+                            ->join('penceramah', 'penceramah.id_penceramah', '=', 'kegiatan.penceramah_id')
+                            ->join('jenis_kegiatan', 'jenis_kegiatan.id_jenis_kegiatan', '=', 'kegiatan.jenis_kegiatan_id')
+                            ->select([
+                                'kegiatan.id_kegiatan',
+                                'kegiatan.judul',
+                                'kegiatan.deskripsi',
+                                'kegiatan.tanggal',
+                                'kegiatan.waktu',
+                                'penceramah.nama_penceramah',
+                                'jenis_kegiatan.nama_kegiatan'
+                            ]);
+                            
+            return DataTables::of($kegiatan)
+            ->addColumn('action', function($kegiatan){
+                $btn = '<a href="javascript:void(0)" data-target="#edit_user" data-toggle="tooltip"  data-id="'.$kegiatan->id_kegiatan.'" data-original-title="Edit" class="edit btn btn-info btn-sm edit-post"><i class="far fa-edit"></i> EDIT</a>';
+                $btn .= '&nbsp;&nbsp;';
+                $btn .= '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$kegiatan->id_kegiatan.'" data-original-title="Delete" class="delete btn btn-danger btn-sm"><i class="far fa-trash-alt"></i> HAPUS</a>';
+                $btn .= '&nbsp;&nbsp;';
+                return $btn;
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+        }
+
+        return view('kegiatan.index', ['penceramah' => $penceramah, 'jenis_kegiatan' => $jenis_kegiatan]);
     }
 
     /**
@@ -36,13 +70,20 @@ class KegiatanController extends Controller
      */
     public function store(Request $request)
     {
-        if($request->ajax()){
-            $kegiatan = DB::table('kegiatan')
-                            ->join('penceramah', 'penceramah.id_penceramah', '=', 'kegiatan.penceramah_id')
-                            ->join('jenis_kegiatan', 'jenis_kegiatan.id_jenis_kegiatan', '=', 'kegiatan.jenis_kegiatan_id')
-                            ->select('kegiatan.judul', 'kegiatan.deskripsi', 'kegiatan.tanggal', 'kegiatan.waktu', 'penceramah.nama_penceramah', 'jenis_kegiatan.nama_kegiatan')
-                            ->get();
-        }
+       $kegiatan = Kegiatan::updateOrCreate(
+                ['id_kegiatan'          => $request->id_kegiatan],
+                [
+                    'judul'             => $request->judul,
+                    'tanggal'           => $request->tanggal,
+                    'deskripsi'         => $request->deskripsi,
+                    'waktu'             => $request->waktu,
+                    'penceramah_id'     => $request->penceramah_id,
+                    'jenis_kegiatan_id' => $request->jenis_kegiatan_id
+                ]
+           );
+        
+        return response()->json($kegiatan);
+    
     }
 
     /**
@@ -64,7 +105,8 @@ class KegiatanController extends Controller
      */
     public function edit($id)
     {
-        //
+        $edit = Kegiatan::where('id_kegiatan', $id)->first();
+        return response()->json($edit);
     }
 
     /**
@@ -87,9 +129,8 @@ class KegiatanController extends Controller
      */
     public function destroy($id)
     {
-        $hapus_kegiatan = Kegiatan::findOrFail($id);
-        $hapus_kegiatan->delete();
+        $hapus = Kegiatan::where('id_kegiatan', $id)->delete();
 
-        return redirect('/kegiatan')->with('sukses', 'Data Berhasil Dihapus');
+        return response()->json($hapus);
     }
 }
